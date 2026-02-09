@@ -33,7 +33,6 @@ The project follows a modular OOP design:
 
 This prototype serves as a foundation for more complex avionics software. Planned upgrades include:
 * **Thread Safety:** Implementing `std::mutex` and `std::lock_guard` for thread-safe data access in a multi-threaded environment.
-* **Smart Pointers:** Migrating from raw pointers to `std::unique_ptr` or `std::shared_ptr` for modern C++ resource management (RAII).
 * **Hardware Abstraction Layer (HAL):** Interfacing with actual sensor drivers or serial ports.
 * **Logging System:** Asynchronous logging of critical events to a file for post-flight analysis.
 
