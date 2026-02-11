@@ -1,40 +1,71 @@
-# Real-Time Avionics Sensor Simulation ✈️
+# Real-Time Avionics Sensor Simulation
 
-A C++ based prototype simulating a **real-time avionics sensor monitoring system**. This project demonstrates the handling of critical flight data (altitude, engine temperature) using Object-Oriented Programming (OOP) principles, dynamic memory management, and sensor fusion logic.
+![Language](https://img.shields.io/badge/language-C%2B%2B14-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## 🚀 Project Overview
+## 🚀 Overview
 
-The primary goal of this simulation is to model the architecture of an embedded software system used in aerospace vehicles. It continuously monitors sensor inputs, processes data streams, and triggers automated warnings when safety thresholds are breached.
+This project is a **multi-threaded C++ simulation** designed to model an avionics sensor network. It demonstrates high-performance system programming concepts by simulating real-time data acquisition from aircraft sensors (Altimeters and Thermometers) and processing this data concurrently through a central control unit.
 
-### Key Technical Features
-* **Runtime Polymorphism:** Utilizes an abstract base class (`Sensor`) and derived classes (`Altimeter`, `Thermometer`) to manage diverse hardware interfaces through a unified pointer system.
-* **Dynamic Memory Management:** Demonstrates manual memory control using raw pointers, dynamic allocation (`new`), and proper deallocation (`delete`) strategies to prevent memory leaks during system shutdown.
-* **Real-Time Simulation Loop:** Implements a continuous monitoring loop (`while(true)`) with `std::this_thread::sleep_for` to simulate sensor sampling rates and processing latency.
-* **Fault Detection:** Includes logic for immediate threshold checking (e.g., Low Altitude Warning, Engine Overheat) to simulate critical safety alerts.
+The project serves as a practical implementation of the **Producer-Consumer design pattern**, focusing on thread safety, resource management, and object-oriented architecture without external dependencies.
+
+## 🛠 Technical Highlights & Skills
+
+This repository demonstrates proficiency in the following C++ system programming concepts:
+
+* **Concurrency & Multithreading:** Utilization of `std::thread` to execute sensor readings (Producers) and data processing (Consumer) in parallel.
+* **Thread Synchronization:** Implementation of `std::mutex`, `std::unique_lock`, and `std::condition_variable` to prevent race conditions and ensure safe access to shared resources.
+* **Modern Memory Management (RAII):** Extensive use of `std::unique_ptr` and `std::make_unique` to ensure automatic resource cleanup and prevent memory leaks.
+* **Object-Oriented Design (OOD):** Application of inheritance and runtime polymorphism through a base `Sensor` abstract class.
+* **Data Structures:** Usage of `std::queue` for buffering sensor data and `std::vector` for managing sensor objects.
 
 ## 📂 System Architecture
 
-The project follows a modular OOP design:
+The simulation consists of three core components:
 
-1.  **`Sensor` (Abstract Base Class):**
-    * Defines the interface for all sensors.
-    * Contains pure virtual functions: `read_data()` and `check_warning()`.
-    * Ensures strict contract adherence for any new sensor type added to the system.
+1.  **Sensors (Producers):**
+    * **Abstract Base Class (`Sensor`):** Defines the interface for all sensors.
+    * **`Altimeter`:** Simulates altitude readings with specific warning thresholds (Low Altitude).
+    * **`Thermometer`:** Simulates engine/cabin temperature readings with overheating warnings.
 
-2.  **`Altimeter` (Derived Class):**
-    * Simulates altitude data acquisition.
-    * **Safety Logic:** Triggers a warning if the aircraft drops below the safe altitude threshold (1010 units).
+2.  **Control Unit (Consumer):**
+    * **`SensorControlUnit`:** Acts as the central processing node. It manages a thread-safe queue where sensors push data. It uses a condition variable to sleep when the queue is empty and wake up only when new data arrives, optimizing CPU usage.
 
-3.  **`Thermometer` (Derived Class):**
-    * Simulates engine temperature monitoring.
-    * **Safety Logic:** Triggers a warning if engine temperature exceeds the critical limit (28°C).
+3.  **Execution Flow:**
+    * The `main` thread initializes the system.
+    * A **Display Thread** is spawned to process and log data from the queue.
+    * A **Sensor Task Thread** is spawned to simulate the continuous reading of sensors.
 
-## 🔮 Future Improvements
+## ⚙️ Build & Run
 
-This prototype serves as a foundation for more complex avionics software. Planned upgrades include:
-* **Thread Safety:** Implementing `std::mutex` and `std::lock_guard` for thread-safe data access in a multi-threaded environment.
-* **Hardware Abstraction Layer (HAL):** Interfacing with actual sensor drivers or serial ports.
-* **Logging System:** Asynchronous logging of critical events to a file for post-flight analysis.
+### Prerequisites
+* A C++ compiler supporting **C++14** or later (GCC, Clang, MSVC).
 
----
-*Developed by Ahmet Emin Satilmis*
+### Compilation (Linux / macOS)
+```bash
+g++ -std=c++14 -pthread main.cpp -o avionics_sim
+./avionics_sim
+Compilation (Windows with MinGW)
+Bash
+g++ -std=c++14 main.cpp -o avionics_sim.exe
+avionics_sim.exe
+📊 Sample Output
+Plaintext
+---System Initiated----
+[WARNING] Engine Thermometer is too high
+Sensor: Main Altimeter Value: 1023.5
+Sensor: Engine Thermometer Value: 29.1
+Sensor: Cabin Thermometer Value: 24.0
+...
+Main Altimeter is Erased from Memory.
+----Sensor Data Stream Terminated-----
+----Program Terminated----
+🔮 Future Improvements
+Implementation of a Circular Buffer (Ring Buffer) to replace std::queue for deterministic latency suitable for embedded systems.
+
+Adding a Logger class to write telemetry data to a file asynchronously.
+
+Unit tests using Google Test (gtest) framework.
+
+📜 License
+This project is open-source and available under the MIT License.
